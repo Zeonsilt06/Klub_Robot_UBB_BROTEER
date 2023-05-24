@@ -34,7 +34,7 @@ PPMReader ppm(reciever , channelAmount);
 int pulseToPWM(int pulse){
   if (pulse >= 1000){
     pulse = map(pulse, 1000, 2000, -500, 500);
-    pulse = constrain(pulse, -255, 255);
+    pulse = constrain(pulse, -200, 200);
   } else{
     pulse = 0;
   }
@@ -83,8 +83,8 @@ void loop() {
   int y_pwm = pulseToPWM(y_dir);
   int z_pwm = pulseToPWM(z_dir);
 
-  int left = y_pwm + x_pwm; left = constrain(left, -255, 255);
-  int right = y_pwm - x_pwm; right = constrain(right, -255, 255);
+  int left = y_pwm + x_pwm; left = constrain(left, -200, 200);
+  int right = y_pwm - x_pwm; right = constrain(right, -200, 200);
 
   Serial.print(x_pwm);
   Serial.print(" ");
@@ -121,13 +121,15 @@ void loop() {
     
     motor_L(left);
     motor_R(right);
-    motor_Up(z_pwm);    
+    motor_F(z_pwm);
+    motor_B(z_pwm);
 
   }
   
 }
 
-void motor_L(int speed){
+//motor bagian kanan
+void motor_R(int speed){
   if(speed > deadzone){
     analogWrite(PWM_L1, 0);
     analogWrite(PWM_R1, abs(speed));
@@ -142,7 +144,8 @@ void motor_L(int speed){
   }
 }
 
-void motor_R(int speed){
+//motor bagian kiri
+void motor_L(int speed){
   if(speed > deadzone){
     analogWrite(PWM_L3, 0);
     analogWrite(PWM_R3, abs(speed));
@@ -157,23 +160,33 @@ void motor_R(int speed){
   }
 }
 
-void motor_Up(int speed){
+//motor bagian depan
+void motor_F(int speed){
   if(speed > deadzone){
     analogWrite(PWM_L2, abs(speed));
     analogWrite(PWM_R2, 0);
-    analogWrite(PWM_L4, 0);
-    analogWrite(PWM_R4, abs(speed));
   }
   else if(speed < deadzone){
     analogWrite(PWM_L2, 0);
     analogWrite(PWM_R2, abs(speed));
-    analogWrite(PWM_L4, abs(speed));
-    analogWrite(PWM_R4, 0);
   }
   else{
     analogWrite(PWM_L2, 0);
     analogWrite(PWM_R2, 0);
+  }
+  
+ //motor bagian belakang
+ void motor_B(int speed){
+  if(speed > deadzone){
+    analogWrite(PWM_L4, 0);
+    analogWrite(PWM_R4, abs(speed));
+  }
+  else if(speed < deadzone){
+    analogWrite(PWM_L4, abs(speed));
+    analogWrite(PWM_R4, 0);
+  }
+  else{
     analogWrite(PWM_L4, 0);
     analogWrite(PWM_R4, 0);
-  }   
+  }
 }
